@@ -766,25 +766,22 @@ async function callAgentAPI(message) {
     'api_key': CONFIG.apiKey
   };
 
-  // Crear conversación si no existe
-  if (!conversationId) {
-    const createRes = await fetch(CONFIG.baseUrl + '/conversations', {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({ title: 'PWA Chat' })
-    });
-    if (createRes.ok) {
-      const createData = await createRes.json();
-      conversationId = createData?.id || createData?.conversation_id;
-    }
-  }
-
-  // Usar conversación fija del owner si no se pudo crear una nueva
+  // Siempre usar conversación fija del owner
   if (!conversationId) {
     conversationId = '69ff4798777455158dc74b38';
   }
 
-  // Enviar mensaje
+  // Contar mensajes actuales antes de enviar (para detectar respuesta nueva)
+  let prevCount = 0;
+  try {
+    const prevRes = await fetch(CONFIG.baseUrl + '/conversations/' + conversationId, { headers });
+    if (prevRes.ok) {
+      const prevData = await prevRes.json();
+      prevCount = (prevData?.messages || []).filter(m => m.role === 'assistant' || m.role === 'agent').length;
+    }
+  } catch(e) {}
+
+  // Enviar mensaje del usuario
   const res = await fetch(CONFIG.baseUrl + '/conversations/' + conversationId + '/messages', {
     method: 'POST',
     headers,
@@ -796,15 +793,25 @@ async function callAgentAPI(message) {
     throw new Error('API Error ' + res.status + ': ' + err);
   }
 
-  const data = await res.json();
+  // Polling: esperar que aparezca un nuevo mensaje del assistant
+  for (let i = 0; i < 20; i++) {
+    await new Promise(r => setTimeout(r, 2500));
+    try {
+      const convRes = await fetch(CONFIG.baseUrl + '/conversations/' + conversationId, { headers });
+      if (!convRes.ok) continue;
+      const convData = await convRes.json();
+      const assistants = (convData?.messages || []).filter(m => m.role === 'assistant' || m.role === 'agent');
+      if (assistants.length > prevCount) {
+        const last = assistants[assistants.length - 1];
+        const content = last?.content;
+        if (content && typeof content === 'string' && content.trim()) {
+          return content;
+        }
+      }
+    } catch(e) { /* continuar */ }
+  }
 
-  // Extraer respuesta del agente
-  return data?.response ||
-         data?.reply ||
-         data?.assistant_message?.content ||
-         data?.content ||
-         data?.message ||
-         JSON.stringify(data);
+  return 'Espera un momento, sigo procesando tu mensaje...';
 }
 
 // ═══════════════════════════════════════════════
