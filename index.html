@@ -493,9 +493,7 @@
 // CONFIG
 // ═══════════════════════════════════════════════
 const CONFIG = {
-  apiKey: 'ebf1c9d7746048b2b3bfdb928b7db6a2',
-  agentId: '69ff4795c5927c8f49974e4b',
-  baseUrl: 'https://app.base44.com/api/agents/69ff4795c5927c8f49974e4b',
+  proxyUrl: 'https://69ff4795c5927c8f49974e4b.base44.app/andreaChatProxy',
   agentAvatar: 'icon-192.png'
 };
 
@@ -758,21 +756,17 @@ async function sendMessage() {
 }
 
 // ═══════════════════════════════════════════════
-// API
+// API — Proxy hacia Andrea IA (Base44 backend)
 // ═══════════════════════════════════════════════
 async function callAgentAPI(message) {
-  const convId = conversationId || CONFIG.convId;
-  const res = await fetch(
-    `${CONFIG.base}/${CONFIG.agentId}/conversations/${convId}/messages`,
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'api_key': CONFIG.apiKey
-      },
-      body: JSON.stringify({ role: 'user', content: message.trim() })
-    }
-  );
+  const res = await fetch(CONFIG.proxyUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      message: message.trim(),
+      conversation_id: conversationId || undefined
+    })
+  });
 
   if (!res.ok) {
     const err = await res.text();
@@ -780,13 +774,8 @@ async function callAgentAPI(message) {
   }
 
   const data = await res.json();
-  if (!conversationId) conversationId = convId;
-
-  // La API devuelve la respuesta del agente directamente en data.content
-  if (typeof data?.content === 'string' && data.content) return data.content;
-  if (Array.isArray(data?.content)) return data.content.map(c => c?.text || '').join('');
-  if (data?.response) return data.response;
-  return '(sin respuesta)';
+  if (data.conversation_id) conversationId = data.conversation_id;
+  return data.response || data.content || data.message || 'Sin respuesta';
 }
 
 // ═══════════════════════════════════════════════
