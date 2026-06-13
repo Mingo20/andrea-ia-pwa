@@ -493,7 +493,9 @@
 // CONFIG
 // ═══════════════════════════════════════════════
 const CONFIG = {
-  proxyUrl: 'https://api.base44.com/api/apps/69ff4795c5927c8f49974e4b/functions/andreaChatProxy',
+  apiKey: 'ebf1c9d7746048b2b3bfdb928b7db6a2',
+  agentId: '69ff4795c5927c8f49974e4b',
+  baseUrl: 'https://app.base44.com/api/agents/69ff4795c5927c8f49974e4b',
   agentAvatar: 'icon-192.png'
 };
 
@@ -759,20 +761,68 @@ async function sendMessage() {
 // API
 // ═══════════════════════════════════════════════
 async function callAgentAPI(message) {
-  const res = await fetch(CONFIG.proxyUrl, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ message: message.trim(), conversation_id: conversationId || null })
-  });
+  const headers = {
+    'Content-Type': 'application/json',
+    'api_key': CONFIG.apiKey
+  };
 
-  if (!res.ok) {
-    const err = await res.text();
-    throw new Error('Proxy error ' + res.status + ': ' + err.slice(0, 200));
+  // Crear conversación si no existe
+  if (!conversationId) {
+    const createRes = await fetch(CONFIG.baseUrl + '/conversations', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ title: 'Andrea PWA' })
+    });
+    if (createRes.ok) {
+      const createData = await createRes.json();
+      conversationId = createData?.id || createData?.conversation_id;
+    }
+    if (!conversationId) throw new Error('No se pudo crear conversación');
   }
 
-  const data = await res.json();
-  if (data.conversation_id) conversationId = data.conversation_id;
-  return data.response || '(sin respuesta)';
+  // Contar mensajes antes de enviar (para detectar respuesta nueva)
+  let msgCountBefore = 0;
+  try {
+    const preRes = await fetch(CONFIG.baseUrl + '/conversations/' + conversationId, { headers });
+    if (preRes.ok) {
+      const preData = await preRes.json();
+      msgCountBefore = (preData?.messages || []).length;
+    }
+  } catch(e) {}
+
+  // Enviar mensaje del usuario
+  const sendRes = await fetch(CONFIG.baseUrl + '/conversations/' + conversationId + '/messages', {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({ role: 'user', content: message.trim() })
+  });
+
+  if (!sendRes.ok) {
+    const err = await sendRes.text();
+    throw new Error('Error ' + sendRes.status + ': ' + err.slice(0, 200));
+  }
+
+  // Polling — esperar respuesta del agente (puede tardar 20-40s)
+  for (let i = 0; i < 25; i++) {
+    await new Promise(r => setTimeout(r, 2500));
+    try {
+      const convRes = await fetch(CONFIG.baseUrl + '/conversations/' + conversationId, { headers });
+      if (!convRes.ok) continue;
+      const convData = await convRes.json();
+      const msgs = convData?.messages || [];
+      if (msgs.length > msgCountBefore) {
+        const newMsgs = msgs.slice(msgCountBefore);
+        const agentMsg = [...newMsgs].reverse().find(m =>
+          m.role === 'assistant' || m.role === 'agent'
+        );
+        if (agentMsg?.content && typeof agentMsg.content === 'string' && agentMsg.content.trim()) {
+          return agentMsg.content;
+        }
+      }
+    } catch(e) { continue; }
+  }
+
+  return '⏳ El agente tardó demasiado. Por favor intenta de nuevo.';
 }
 
 // ═══════════════════════════════════════════════
