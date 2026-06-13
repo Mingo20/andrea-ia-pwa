@@ -38,7 +38,7 @@
       overflow: hidden;
     }
 
-    /* HEADER */
+    /* ── HEADER ── */
     .header {
       display: flex;
       align-items: center;
@@ -51,11 +51,11 @@
       top: 0;
       z-index: 100;
     }
+    /* Avatar sin anillo verde */
     .header-avatar {
       width: 42px;
       height: 42px;
       border-radius: 50%;
-      border: 2px solid var(--accent);
       object-fit: cover;
       background: var(--bg3);
     }
@@ -71,14 +71,14 @@
       background: var(--bg3);
       border: none;
       color: var(--text2);
-      font-size: 16px;
       cursor: pointer;
       display: flex; align-items: center; justify-content: center;
       transition: all 0.2s;
     }
     .header-btn:hover { background: var(--bg2); color: var(--text); }
+    .header-btn svg { width: 18px; height: 18px; }
 
-    /* CHAT AREA */
+    /* ── CHAT AREA ── */
     .chat-container {
       flex: 1;
       overflow-y: auto;
@@ -90,7 +90,7 @@
     .chat-container::-webkit-scrollbar-track { background: transparent; }
     .chat-container::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
-    /* WELCOME SCREEN */
+    /* ── WELCOME ── */
     .welcome {
       display: flex;
       flex-direction: column;
@@ -105,17 +105,18 @@
       position: relative;
       width: 110px; height: 110px;
     }
+    /* Glow solo como sombra difusa — sin anillos ni bordes verdes */
     .welcome-avatar-glow {
       position: absolute;
-      inset: -8px;
+      inset: 0;
       border-radius: 50%;
-      border: 2.5px solid var(--accent);
-      box-shadow: 0 0 24px var(--accent-glow), 0 0 48px var(--accent-glow);
+      box-shadow: 0 0 32px var(--accent-glow);
+      pointer-events: none;
       animation: glowPulse 3s ease-in-out infinite;
     }
     @keyframes glowPulse {
-      0%,100%{ box-shadow: 0 0 20px var(--accent-glow), 0 0 40px var(--accent-glow); }
-      50%{ box-shadow: 0 0 35px var(--accent-glow), 0 0 70px var(--accent-glow); }
+      0%,100%{ box-shadow: 0 0 20px var(--accent-glow); }
+      50%{ box-shadow: 0 0 45px var(--accent-glow); }
     }
     .welcome-avatar {
       width: 110px; height: 110px;
@@ -150,9 +151,10 @@
       white-space: nowrap;
     }
     .suggestion-btn:hover { background: var(--bg2); border-color: var(--accent); color: var(--accent); }
-    .suggestion-btn .icon { font-size: 14px; }
+    .suggestion-btn .icon { display: flex; align-items: center; }
+    .suggestion-btn svg { width: 15px; height: 15px; }
 
-    /* MESSAGES */
+    /* ── MESSAGES ── */
     .message-group { margin-top: 16px; display: flex; flex-direction: column; gap: 3px; }
     .message-row { display: flex; align-items: flex-end; gap: 8px; }
     .message-row.user { flex-direction: row-reverse; }
@@ -181,7 +183,6 @@
       border-radius: 50%;
       object-fit: cover;
       flex-shrink: 0;
-      border: 1.5px solid var(--accent);
     }
     .message-time {
       font-size: 10px;
@@ -191,7 +192,7 @@
     }
     .message-row.user .message-time { text-align: left; }
 
-    /* TYPING INDICATOR */
+    /* ── TYPING ── */
     .typing {
       display: flex;
       align-items: center;
@@ -216,22 +217,23 @@
     .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
     @keyframes bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-6px)} }
 
-    /* INPUT AREA */
+    /* ── INPUT AREA — fondo gris claro ── */
     .input-area {
-      padding: 10px 12px 16px;
-      background: var(--bg);
-      border-top: 1px solid var(--border);
+      padding: 10px 12px 20px;
+      background: #e0e0e0;
+      border-top: 1px solid #cccccc;
       flex-shrink: 0;
     }
     .input-wrap {
       display: flex;
       align-items: flex-end;
       gap: 8px;
-      background: var(--input-bg);
-      border: 1px solid var(--border);
+      background: #ffffff;
+      border: 1px solid #c8c8c8;
       border-radius: 26px;
       padding: 8px 8px 8px 16px;
       transition: border-color 0.2s;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
     }
     .input-wrap:focus-within { border-color: var(--accent); }
     #messageInput {
@@ -239,27 +241,27 @@
       background: transparent;
       border: none;
       outline: none;
-      color: var(--text);
+      color: #111111;
       font-size: 15px;
       resize: none;
       max-height: 120px;
       overflow-y: auto;
       line-height: 1.4;
     }
-    #messageInput::placeholder { color: var(--text2); }
+    #messageInput::placeholder { color: #888888; }
     .input-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
     .attach-btn, .mic-btn {
       width: 34px; height: 34px;
       border-radius: 50%;
       background: transparent;
       border: none;
-      color: var(--text2);
-      font-size: 18px;
+      color: #555555;
       cursor: pointer;
       display: flex; align-items: center; justify-content: center;
       transition: all 0.2s;
     }
-    .attach-btn:hover, .mic-btn:hover { color: var(--accent); }
+    .attach-btn svg, .mic-btn svg { width: 20px; height: 20px; }
+    .attach-btn:hover, .mic-btn:hover { color: #111; background: rgba(0,0,0,0.07); }
     .mic-btn.recording { color: #ff4444; animation: micPulse 1s infinite; }
     @keyframes micPulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.15)} }
     .send-btn {
@@ -268,18 +270,18 @@
       background: var(--send-btn);
       border: none;
       color: #000;
-      font-size: 17px;
       cursor: pointer;
       display: flex; align-items: center; justify-content: center;
       flex-shrink: 0;
       transition: all 0.2s;
       box-shadow: 0 0 12px var(--accent-glow);
     }
+    .send-btn svg { width: 18px; height: 18px; }
     .send-btn:hover { transform: scale(1.05); box-shadow: 0 0 20px var(--accent-glow); }
     .send-btn:active { transform: scale(0.96); }
     .send-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 
-    /* RECORDING BANNER */
+    /* ── RECORDING BANNER ── */
     .recording-banner {
       display: none;
       align-items: center;
@@ -295,7 +297,7 @@
     .recording-banner.active { display: flex; }
     .rec-dot { width: 8px; height: 8px; border-radius: 50%; background: #ff4444; animation: micPulse 1s infinite; }
 
-    /* MARKDOWN STYLES */
+    /* ── MARKDOWN ── */
     .bubble.agent p { margin-bottom: 6px; }
     .bubble.agent p:last-child { margin-bottom: 0; }
     .bubble.agent ul, .bubble.agent ol { padding-left: 18px; margin: 6px 0; }
@@ -318,7 +320,7 @@
     .bubble.agent pre code { background: none; padding: 0; }
     .bubble.agent strong { color: var(--accent); }
 
-    /* TOAST */
+    /* ── TOAST ── */
     .toast {
       position: fixed;
       bottom: 90px;
@@ -341,6 +343,69 @@
 </head>
 <body>
 
+<!-- ═══ SVG ICON SPRITE ═══ -->
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+  <symbol id="ic-new-chat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 20H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6"/>
+    <line x1="18" y1="14" x2="18" y2="20"/>
+    <line x1="15" y1="17" x2="21" y2="17"/>
+  </symbol>
+  <symbol id="ic-theme" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="4"/>
+    <line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/>
+    <line x1="4.22" y1="4.22" x2="6.34" y2="6.34"/><line x1="17.66" y1="17.66" x2="19.78" y2="19.78"/>
+    <line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/>
+    <line x1="4.22" y1="19.78" x2="6.34" y2="17.66"/><line x1="17.66" y1="6.34" x2="19.78" y2="4.22"/>
+  </symbol>
+  <symbol id="ic-attach" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66L9.41 17.41A2 2 0 0 1 6.59 14.6l8.49-8.49"/>
+  </symbol>
+  <symbol id="ic-mic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="9" y="2" width="6" height="11" rx="3"/>
+    <path d="M5 10a7 7 0 0 0 14 0"/>
+    <line x1="12" y1="19" x2="12" y2="22"/>
+    <line x1="9" y1="22" x2="15" y2="22"/>
+  </symbol>
+  <symbol id="ic-mic-stop" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="9" y="2" width="6" height="11" rx="3"/>
+    <path d="M5 10a7 7 0 0 0 14 0"/>
+    <line x1="12" y1="19" x2="12" y2="22"/>
+    <line x1="9" y1="22" x2="15" y2="22"/>
+    <circle cx="18" cy="4" r="3" fill="#ff4444" stroke="none"/>
+  </symbol>
+  <symbol id="ic-send" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="5" y1="19" x2="19" y2="5"/>
+    <polyline points="9 5 19 5 19 15"/>
+  </symbol>
+  <symbol id="ic-cal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="3" y="4" width="18" height="18" rx="2"/>
+    <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>
+    <line x1="3" y1="10" x2="21" y2="10"/>
+  </symbol>
+  <symbol id="ic-doc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+    <polyline points="14 2 14 8 20 8"/>
+    <line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/>
+  </symbol>
+  <symbol id="ic-help" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="10"/>
+    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+    <circle cx="12" cy="17" r="0.5" fill="currentColor"/>
+  </symbol>
+  <symbol id="ic-chat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+  </symbol>
+  <symbol id="ic-clip" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+    <rect x="8" y="2" width="8" height="4" rx="1"/>
+    <line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/>
+  </symbol>
+  <symbol id="ic-book" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+  </symbol>
+</svg>
+
 <!-- HEADER -->
 <div class="header">
   <img src="icon-192.png" alt="Andrea" class="header-avatar" />
@@ -349,14 +414,17 @@
     <div class="header-status"><span class="status-dot"></span> En línea</div>
   </div>
   <div class="header-actions">
-    <button class="header-btn" onclick="newChat()" title="Nueva conversación">✏️</button>
-    <button class="header-btn" onclick="toggleTheme()" title="Tema">☀️</button>
+    <button class="header-btn" onclick="newChat()" title="Nueva conversación">
+      <svg><use href="#ic-new-chat"/></svg>
+    </button>
+    <button class="header-btn" onclick="toggleTheme()" title="Tema">
+      <svg><use href="#ic-theme"/></svg>
+    </button>
   </div>
 </div>
 
 <!-- CHAT CONTAINER -->
 <div class="chat-container" id="chatContainer">
-  <!-- WELCOME SCREEN -->
   <div class="welcome" id="welcomeScreen">
     <div class="welcome-avatar-wrap">
       <div class="welcome-avatar-glow"></div>
@@ -365,12 +433,24 @@
     <div class="welcome-title">Hola, soy <span>Andrea</span></div>
     <div class="welcome-subtitle">Tu asistente inteligente. Puedo ayudarte con planificaciones, documentos, consultas y mucho más.</div>
     <div class="suggestions">
-      <button class="suggestion-btn" onclick="sendSuggestion('Crear una planificación')"><span class="icon">📅</span> Planificación</button>
-      <button class="suggestion-btn" onclick="sendSuggestion('Crear una rúbrica de evaluación')"><span class="icon">📄</span> Rúbrica</button>
-      <button class="suggestion-btn" onclick="sendSuggestion('¿Qué puedes hacer?')"><span class="icon">❓</span> ¿Qué haces?</button>
-      <button class="suggestion-btn" onclick="sendSuggestion('Redactar un comunicado')"><span class="icon">💬</span> Comunicado</button>
-      <button class="suggestion-btn" onclick="sendSuggestion('Crear un informe')"><span class="icon">📋</span> Informe</button>
-      <button class="suggestion-btn" onclick="sendSuggestion('Consultar lineamientos MINERD')"><span class="icon">📚</span> MINERD</button>
+      <button class="suggestion-btn" onclick="sendSuggestion('Crear una planificación')">
+        <span class="icon"><svg><use href="#ic-cal"/></svg></span> Planificación
+      </button>
+      <button class="suggestion-btn" onclick="sendSuggestion('Crear una rúbrica de evaluación')">
+        <span class="icon"><svg><use href="#ic-doc"/></svg></span> Rúbrica
+      </button>
+      <button class="suggestion-btn" onclick="sendSuggestion('¿Qué puedes hacer?')">
+        <span class="icon"><svg><use href="#ic-help"/></svg></span> ¿Qué haces?
+      </button>
+      <button class="suggestion-btn" onclick="sendSuggestion('Redactar un comunicado')">
+        <span class="icon"><svg><use href="#ic-chat"/></svg></span> Comunicado
+      </button>
+      <button class="suggestion-btn" onclick="sendSuggestion('Crear un informe')">
+        <span class="icon"><svg><use href="#ic-clip"/></svg></span> Informe
+      </button>
+      <button class="suggestion-btn" onclick="sendSuggestion('Consultar lineamientos MINERD')">
+        <span class="icon"><svg><use href="#ic-book"/></svg></span> MINERD
+      </button>
     </div>
   </div>
 </div>
@@ -381,7 +461,7 @@
   <span>Grabando audio... toca el micrófono para detener</span>
 </div>
 
-<!-- INPUT AREA -->
+<!-- INPUT AREA (fondo gris claro) -->
 <div class="input-area">
   <div class="input-wrap">
     <textarea
@@ -393,9 +473,15 @@
     ></textarea>
     <div class="input-actions">
       <input type="file" id="fileInput" style="display:none" accept="image/*,application/pdf,.doc,.docx" />
-      <button class="attach-btn" onclick="document.getElementById('fileInput').click()" title="Adjuntar">📎</button>
-      <button class="mic-btn" id="micBtn" onclick="toggleRecording()" title="Voz">🎤</button>
-      <button class="send-btn" id="sendBtn" onclick="sendMessage()" title="Enviar">➤</button>
+      <button class="attach-btn" onclick="document.getElementById('fileInput').click()" title="Adjuntar">
+        <svg><use href="#ic-attach"/></svg>
+      </button>
+      <button class="mic-btn" id="micBtn" onclick="window.toggleRecording()" title="Voz">
+        <svg id="micIconSvg"><use id="micIconUse" href="#ic-mic"/></svg>
+      </button>
+      <button class="send-btn" id="sendBtn" onclick="sendMessage()" title="Enviar">
+        <svg><use href="#ic-send"/></svg>
+      </button>
     </div>
   </div>
 </div>
@@ -404,13 +490,12 @@
 
 <script>
 // ═══════════════════════════════════════════════
-// CONFIG — REEMPLAZAR CON TU API KEY Y APP ID
+// CONFIG
 // ═══════════════════════════════════════════════
 const CONFIG = {
-  apiKey: 'ebf1c9d7746048b2b3bfdb928b7db6a2',          // Reemplazar
+  apiKey: 'ebf1c9d7746048b2b3bfdb928b7db6a2',
   appId: '69ff4795c5927c8f49974e4b',
   baseUrl: 'https://api.base44.com/api/apps/69ff4795c5927c8f49974e4b/agent',
-  agentName: 'Andrea IA',
   agentAvatar: 'icon-192.png'
 };
 
@@ -509,107 +594,139 @@ function newChat() {
       <div class="welcome-title">Hola, soy <span>Andrea</span></div>
       <div class="welcome-subtitle">Tu asistente inteligente. Puedo ayudarte con planificaciones, documentos, consultas y mucho más.</div>
       <div class="suggestions">
-        <button class="suggestion-btn" onclick="sendSuggestion('Crear una planificación')"><span class="icon">📅</span> Planificación</button>
-        <button class="suggestion-btn" onclick="sendSuggestion('Crear una rúbrica de evaluación')"><span class="icon">📄</span> Rúbrica</button>
-        <button class="suggestion-btn" onclick="sendSuggestion('¿Qué puedes hacer?')"><span class="icon">❓</span> ¿Qué haces?</button>
-        <button class="suggestion-btn" onclick="sendSuggestion('Redactar un comunicado')"><span class="icon">💬</span> Comunicado</button>
-        <button class="suggestion-btn" onclick="sendSuggestion('Crear un informe')"><span class="icon">📋</span> Informe</button>
-        <button class="suggestion-btn" onclick="sendSuggestion('Consultar lineamientos MINERD')"><span class="icon">📚</span> MINERD</button>
+        <button class="suggestion-btn" onclick="sendSuggestion('Crear una planificación')">
+          <span class="icon"><svg><use href="#ic-cal"/></svg></span> Planificación
+        </button>
+        <button class="suggestion-btn" onclick="sendSuggestion('Crear una rúbrica de evaluación')">
+          <span class="icon"><svg><use href="#ic-doc"/></svg></span> Rúbrica
+        </button>
+        <button class="suggestion-btn" onclick="sendSuggestion('¿Qué puedes hacer?')">
+          <span class="icon"><svg><use href="#ic-help"/></svg></span> ¿Qué haces?
+        </button>
+        <button class="suggestion-btn" onclick="sendSuggestion('Redactar un comunicado')">
+          <span class="icon"><svg><use href="#ic-chat"/></svg></span> Comunicado
+        </button>
+        <button class="suggestion-btn" onclick="sendSuggestion('Crear un informe')">
+          <span class="icon"><svg><use href="#ic-clip"/></svg></span> Informe
+        </button>
+        <button class="suggestion-btn" onclick="sendSuggestion('Consultar lineamientos MINERD')">
+          <span class="icon"><svg><use href="#ic-book"/></svg></span> MINERD
+        </button>
       </div>
     </div>`;
 }
 
 function toggleTheme() {
-  // Dark mode only for now — can expand
-  showToast('Tema oscuro activo ✓');
+  darkMode = !darkMode;
+  const root = document.documentElement.style;
+  if (!darkMode) {
+    root.setProperty('--bg', '#f5f5f5');
+    root.setProperty('--bg2', '#e8e8e8');
+    root.setProperty('--bg3', '#dddddd');
+    root.setProperty('--text', '#111111');
+    root.setProperty('--text2', '#555555');
+    root.setProperty('--agent-bubble', '#eeeeee');
+    root.setProperty('--border', '#cccccc');
+    root.setProperty('--input-bg', '#ffffff');
+  } else {
+    root.setProperty('--bg', '#0f0f0f');
+    root.setProperty('--bg2', '#1a1a1a');
+    root.setProperty('--bg3', '#252525');
+    root.setProperty('--text', '#ffffff');
+    root.setProperty('--text2', '#aaaaaa');
+    root.setProperty('--agent-bubble', '#1e1e1e');
+    root.setProperty('--border', '#2a2a2a');
+    root.setProperty('--input-bg', '#1c1c1c');
+  }
 }
 
 // ═══════════════════════════════════════════════
-// RENDER MESSAGES
+// RENDER
 // ═══════════════════════════════════════════════
 function renderMessage(role, content, time, save = true) {
   const container = document.getElementById('chatContainer');
-  const isUser = role === 'user';
+  const t = time || getTime();
+
   const group = document.createElement('div');
   group.className = 'message-group';
 
   const row = document.createElement('div');
-  row.className = `message-row ${isUser ? 'user' : 'agent'}`;
+  row.className = 'message-row ' + role;
 
-  if (!isUser) {
-    const av = document.createElement('img');
-    av.src = CONFIG.agentAvatar;
-    av.className = 'bubble-avatar';
-    row.appendChild(av);
+  if (role === 'agent') {
+    const avatar = document.createElement('img');
+    avatar.src = CONFIG.agentAvatar;
+    avatar.className = 'bubble-avatar';
+    row.appendChild(avatar);
   }
 
   const bubble = document.createElement('div');
-  bubble.className = `bubble ${isUser ? 'user' : 'agent'}`;
-  bubble.innerHTML = isUser ? escapeHtml(content) : renderMarkdown(content);
+  bubble.className = 'bubble ' + role;
+  bubble.innerHTML = role === 'agent' ? parseMarkdown(content) : escapeHtml(content);
   row.appendChild(bubble);
   group.appendChild(row);
 
   const timeEl = document.createElement('div');
   timeEl.className = 'message-time';
-  timeEl.textContent = time || getTime();
+  timeEl.textContent = t;
   group.appendChild(timeEl);
 
   container.appendChild(group);
+  scrollToBottom();
 
   if (save) {
-    messages.push({ role, content, time: time || getTime() });
+    messages.push({ role, content, time: t });
     saveToStorage();
   }
-
-  scrollToBottom();
 }
 
-function escapeHtml(text) {
-  return text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
-
-function renderMarkdown(text) {
+function parseMarkdown(text) {
   return text
-    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*(.*?)\*/g, '<em>$1</em>')
-    .replace(/`([^`]+)`/g, '<code>$1</code>')
-    .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>')
-    .replace(/^### (.*)/gm, '<strong>$1</strong>')
-    .replace(/^## (.*)/gm, '<strong>$1</strong>')
-    .replace(/^# (.*)/gm, '<strong>$1</strong>')
-    .replace(/^- (.*)/gm, '<li>$1</li>')
-    .replace(/(<li>.*<\/li>)/gs, '<ul>$1</ul>')
-    .replace(/\n\n/g, '</p><p>')
-    .replace(/\n/g, '<br>')
-    .replace(/^(.+)$/, '<p>$1</p>');
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g,'<em>$1</em>')
+    .replace(/`([^`]+)`/g,'<code>$1</code>')
+    .replace(/^#{1,3} (.+)$/gm,'<strong>$1</strong>')
+    .replace(/^[-*] (.+)$/gm,'<li>$1</li>')
+    .replace(/\n\n/g,'</p><p>')
+    .replace(/\n/g,'<br>');
+}
+
+function escapeHtml(t) {
+  return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
 // ═══════════════════════════════════════════════
-// TYPING INDICATOR
+// TYPING
 // ═══════════════════════════════════════════════
 function showTyping() {
   const container = document.getElementById('chatContainer');
   const div = document.createElement('div');
   div.className = 'typing';
   div.id = 'typingIndicator';
-  div.innerHTML = `
-    <img src="${CONFIG.agentAvatar}" class="bubble-avatar" alt="Andrea" />
-    <div class="typing-dots"><span></span><span></span><span></span></div>`;
+  const avatar = document.createElement('img');
+  avatar.src = CONFIG.agentAvatar;
+  avatar.className = 'bubble-avatar';
+  const dots = document.createElement('div');
+  dots.className = 'typing-dots';
+  dots.innerHTML = '<span></span><span></span><span></span>';
+  div.appendChild(avatar);
+  div.appendChild(dots);
   container.appendChild(div);
   scrollToBottom();
 }
 
 function hideTyping() {
-  const el = document.getElementById('typingIndicator');
-  if (el) el.remove();
+  const t = document.getElementById('typingIndicator');
+  if (t) t.remove();
 }
 
 // ═══════════════════════════════════════════════
-// SEND MESSAGE
+// SEND
 // ═══════════════════════════════════════════════
-async function sendSuggestion(text) {
+function sendSuggestion(text) {
   document.getElementById('messageInput').value = text;
-  await sendMessage();
+  sendMessage();
 }
 
 async function sendMessage() {
@@ -620,10 +737,10 @@ async function sendMessage() {
   hideWelcome();
   input.value = '';
   input.style.height = 'auto';
-  document.getElementById('sendBtn').disabled = true;
-  isTyping = true;
-
   renderMessage('user', text);
+
+  isTyping = true;
+  document.getElementById('sendBtn').disabled = true;
   showTyping();
 
   try {
@@ -641,7 +758,7 @@ async function sendMessage() {
 }
 
 // ═══════════════════════════════════════════════
-// BASE44 AGENT API
+// API
 // ═══════════════════════════════════════════════
 async function callAgentAPI(message) {
   const body = { message };
@@ -649,16 +766,13 @@ async function callAgentAPI(message) {
 
   const res = await fetch(CONFIG.baseUrl + '/chat', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'ApiKey': CONFIG.apiKey
-    },
+    headers: { 'Content-Type': 'application/json', 'ApiKey': CONFIG.apiKey },
     body: JSON.stringify(body)
   });
 
   if (!res.ok) {
     const err = await res.text();
-    throw new Error(`API Error ${res.status}: ${err}`);
+    throw new Error('API Error ' + res.status + ': ' + err);
   }
 
   const data = await res.json();
@@ -667,160 +781,92 @@ async function callAgentAPI(message) {
 }
 
 // ═══════════════════════════════════════════════
-// AUDIO RECORDING + TRANSCRIPTION
+// MIC
 // ═══════════════════════════════════════════════
-async function toggleRecording() {
-  if (!isRecording) {
-    await startRecording();
-  } else {
-    stopRecording();
-  }
+function setMicIcon(recording) {
+  document.getElementById('micIconUse').setAttribute('href', recording ? '#ic-mic-stop' : '#ic-mic');
+  document.getElementById('micBtn').classList.toggle('recording', recording);
 }
+
+window.toggleRecording = async function() {
+  if (!isRecording) {
+    const used = startSpeechRecognition();
+    if (!used) await startRecording();
+  } else {
+    if (!(window.SpeechRecognition || window.webkitSpeechRecognition)) stopRecording();
+  }
+};
 
 async function startRecording() {
   try {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     mediaRecorder = new MediaRecorder(stream, { mimeType: getSupportedMimeType() });
     audioChunks = [];
-
-    mediaRecorder.ondataavailable = (e) => {
-      if (e.data.size > 0) audioChunks.push(e.data);
-    };
-
+    mediaRecorder.ondataavailable = e => { if (e.data.size > 0) audioChunks.push(e.data); };
     mediaRecorder.onstop = async () => {
       stream.getTracks().forEach(t => t.stop());
-      const audioBlob = new Blob(audioChunks, { type: mediaRecorder.mimeType });
-      await transcribeAudio(audioBlob);
+      await transcribeAudio(new Blob(audioChunks, { type: mediaRecorder.mimeType }));
     };
-
     mediaRecorder.start(250);
     isRecording = true;
-    document.getElementById('micBtn').classList.add('recording');
-    document.getElementById('micBtn').textContent = '⏹️';
+    setMicIcon(true);
     document.getElementById('recordingBanner').classList.add('active');
-  } catch (err) {
-    showToast('No se pudo acceder al micrófono');
-    console.error(err);
-  }
+  } catch(err) { showToast('No se pudo acceder al micrófono'); }
 }
 
 function stopRecording() {
-  if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-    mediaRecorder.stop();
-  }
+  if (mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop();
   isRecording = false;
-  document.getElementById('micBtn').classList.remove('recording');
-  document.getElementById('micBtn').textContent = '🎤';
+  setMicIcon(false);
   document.getElementById('recordingBanner').classList.remove('active');
   showToast('Procesando audio...');
 }
 
 function getSupportedMimeType() {
-  const types = ['audio/webm;codecs=opus', 'audio/webm', 'audio/ogg;codecs=opus', 'audio/mp4'];
-  for (const type of types) {
-    if (MediaRecorder.isTypeSupported(type)) return type;
+  for (const t of ['audio/webm;codecs=opus','audio/webm','audio/ogg;codecs=opus','audio/mp4']) {
+    if (MediaRecorder.isTypeSupported(t)) return t;
   }
   return '';
 }
 
 async function transcribeAudio(audioBlob) {
-  // Usar Web Speech API si está disponible (sin costo)
-  if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-    showToast('Usando reconocimiento de voz del navegador');
-    return;
-  }
-
-  // Fallback: Enviar audio a Base44 para transcripción
   try {
-    const formData = new FormData();
-    formData.append('file', audioBlob, 'recording.webm');
-
-    const res = await fetch(CONFIG.baseUrl + '/transcribe', {
-      method: 'POST',
-      headers: { 'ApiKey': CONFIG.apiKey },
-      body: formData
-    });
-
+    const fd = new FormData();
+    fd.append('file', audioBlob, 'recording.webm');
+    const res = await fetch(CONFIG.baseUrl + '/transcribe', { method:'POST', headers:{'ApiKey':CONFIG.apiKey}, body:fd });
     if (res.ok) {
-      const data = await res.json();
-      const transcript = data.text || data.transcript || '';
-      if (transcript) {
-        document.getElementById('messageInput').value = transcript;
-        showToast('✓ Audio transcrito');
-      }
+      const d = await res.json();
+      const tr = d.text || d.transcript || '';
+      if (tr) { document.getElementById('messageInput').value = tr; showToast('✓ Audio transcrito'); }
     }
-  } catch (err) {
-    showToast('Error al transcribir audio');
-  }
+  } catch(e) { showToast('Error al transcribir audio'); }
 }
 
-// ═══════════════════════════════════════════════
-// SPEECH RECOGNITION (Web Speech API)
-// ═══════════════════════════════════════════════
 function startSpeechRecognition() {
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SpeechRecognition) return false;
-
-  const recognition = new SpeechRecognition();
-  recognition.lang = 'es-DO';
-  recognition.continuous = false;
-  recognition.interimResults = true;
-
-  recognition.onstart = () => {
-    isRecording = true;
-    document.getElementById('micBtn').classList.add('recording');
-    document.getElementById('micBtn').textContent = '⏹️';
-    document.getElementById('recordingBanner').classList.add('active');
-  };
-
-  recognition.onresult = (event) => {
-    const transcript = Array.from(event.results)
-      .map(r => r[0].transcript).join('');
-    document.getElementById('messageInput').value = transcript;
-  };
-
-  recognition.onend = () => {
-    isRecording = false;
-    document.getElementById('micBtn').classList.remove('recording');
-    document.getElementById('micBtn').textContent = '🎤';
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) return false;
+  const r = new SR();
+  r.lang = 'es-DO'; r.continuous = false; r.interimResults = true;
+  r.onstart = () => { isRecording = true; setMicIcon(true); document.getElementById('recordingBanner').classList.add('active'); };
+  r.onresult = e => { document.getElementById('messageInput').value = Array.from(e.results).map(x=>x[0].transcript).join(''); };
+  r.onend = () => {
+    isRecording = false; setMicIcon(false);
     document.getElementById('recordingBanner').classList.remove('active');
-    const text = document.getElementById('messageInput').value.trim();
-    if (text) sendMessage();
+    const txt = document.getElementById('messageInput').value.trim();
+    if (txt) sendMessage();
   };
-
-  recognition.onerror = () => {
-    isRecording = false;
-    document.getElementById('micBtn').classList.remove('recording');
-    document.getElementById('micBtn').textContent = '🎤';
-    document.getElementById('recordingBanner').classList.remove('active');
-  };
-
-  recognition.start();
+  r.onerror = () => { isRecording = false; setMicIcon(false); document.getElementById('recordingBanner').classList.remove('active'); };
+  r.start();
   return true;
 }
 
-// Override toggleRecording para usar Web Speech API cuando esté disponible
-const originalToggle = toggleRecording;
-window.toggleRecording = async function() {
-  if (!isRecording) {
-    const usedSpeech = startSpeechRecognition();
-    if (!usedSpeech) await startRecording();
-  } else {
-    if (window.SpeechRecognition || window.webkitSpeechRecognition) {
-      // handled by onend
-    } else {
-      stopRecording();
-    }
-  }
-};
-
 // FILE ATTACH
-document.getElementById('fileInput').addEventListener('change', (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
-  showToast(`Adjunto: ${file.name}`);
-  const input = document.getElementById('messageInput');
-  input.value = input.value ? input.value + ` [Archivo: ${file.name}]` : `[Archivo: ${file.name}]`;
+document.getElementById('fileInput').addEventListener('change', e => {
+  const f = e.target.files[0];
+  if (!f) return;
+  showToast('Adjunto: ' + f.name);
+  const inp = document.getElementById('messageInput');
+  inp.value = inp.value ? inp.value + ' [Archivo: ' + f.name + ']' : '[Archivo: ' + f.name + ']';
 });
 </script>
 </body>
