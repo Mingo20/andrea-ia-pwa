@@ -761,68 +761,32 @@ async function sendMessage() {
 // API
 // ═══════════════════════════════════════════════
 async function callAgentAPI(message) {
-  const headers = {
-    'Content-Type': 'application/json',
-    'api_key': CONFIG.apiKey
-  };
-
-  // Crear conversación si no existe
-  if (!conversationId) {
-    const createRes = await fetch(CONFIG.baseUrl + '/conversations', {
+  const convId = conversationId || CONFIG.convId;
+  const res = await fetch(
+    `${CONFIG.base}/${CONFIG.agentId}/conversations/${convId}/messages`,
+    {
       method: 'POST',
-      headers,
-      body: JSON.stringify({ title: 'Andrea PWA' })
-    });
-    if (createRes.ok) {
-      const createData = await createRes.json();
-      conversationId = createData?.id || createData?.conversation_id;
+      headers: {
+        'Content-Type': 'application/json',
+        'api_key': CONFIG.apiKey
+      },
+      body: JSON.stringify({ role: 'user', content: message.trim() })
     }
-    if (!conversationId) throw new Error('No se pudo crear conversación');
+  );
+
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error('Error ' + res.status + ': ' + err.slice(0, 200));
   }
 
-  // Contar mensajes antes de enviar (para detectar respuesta nueva)
-  let msgCountBefore = 0;
-  try {
-    const preRes = await fetch(CONFIG.baseUrl + '/conversations/' + conversationId, { headers });
-    if (preRes.ok) {
-      const preData = await preRes.json();
-      msgCountBefore = (preData?.messages || []).length;
-    }
-  } catch(e) {}
+  const data = await res.json();
+  if (!conversationId) conversationId = convId;
 
-  // Enviar mensaje del usuario
-  const sendRes = await fetch(CONFIG.baseUrl + '/conversations/' + conversationId + '/messages', {
-    method: 'POST',
-    headers,
-    body: JSON.stringify({ role: 'user', content: message.trim() })
-  });
-
-  if (!sendRes.ok) {
-    const err = await sendRes.text();
-    throw new Error('Error ' + sendRes.status + ': ' + err.slice(0, 200));
-  }
-
-  // Polling — esperar respuesta del agente (puede tardar 20-40s)
-  for (let i = 0; i < 25; i++) {
-    await new Promise(r => setTimeout(r, 2500));
-    try {
-      const convRes = await fetch(CONFIG.baseUrl + '/conversations/' + conversationId, { headers });
-      if (!convRes.ok) continue;
-      const convData = await convRes.json();
-      const msgs = convData?.messages || [];
-      if (msgs.length > msgCountBefore) {
-        const newMsgs = msgs.slice(msgCountBefore);
-        const agentMsg = [...newMsgs].reverse().find(m =>
-          m.role === 'assistant' || m.role === 'agent'
-        );
-        if (agentMsg?.content && typeof agentMsg.content === 'string' && agentMsg.content.trim()) {
-          return agentMsg.content;
-        }
-      }
-    } catch(e) { continue; }
-  }
-
-  return '⏳ El agente tardó demasiado. Por favor intenta de nuevo.';
+  // La API devuelve la respuesta del agente directamente en data.content
+  if (typeof data?.content === 'string' && data.content) return data.content;
+  if (Array.isArray(data?.content)) return data.content.map(c => c?.text || '').join('');
+  if (data?.response) return data.response;
+  return '(sin respuesta)';
 }
 
 // ═══════════════════════════════════════════════
