@@ -495,7 +495,7 @@
 const CONFIG = {
   apiKey: 'ebf1c9d7746048b2b3bfdb928b7db6a2',
   appId: '69ff4795c5927c8f49974e4b',
-  baseUrl: 'https://api.base44.com/api/apps/69ff4795c5927c8f49974e4b/agent',
+  baseUrl: 'https://app.base44.com/api/agents/69ff4795c5927c8f49974e4b',
   agentAvatar: 'icon-192.png'
 };
 
@@ -761,13 +761,34 @@ async function sendMessage() {
 // API
 // ═══════════════════════════════════════════════
 async function callAgentAPI(message) {
-  const body = { message };
-  if (conversationId) body.conversation_id = conversationId;
+  const headers = {
+    'Content-Type': 'application/json',
+    'api_key': CONFIG.apiKey
+  };
 
-  const res = await fetch(CONFIG.baseUrl + '/chat', {
+  // Crear conversación si no existe
+  if (!conversationId) {
+    const createRes = await fetch(CONFIG.baseUrl + '/conversations', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ title: 'PWA Chat' })
+    });
+    if (createRes.ok) {
+      const createData = await createRes.json();
+      conversationId = createData?.id || createData?.conversation_id;
+    }
+  }
+
+  // Usar conversación fija del owner si no se pudo crear una nueva
+  if (!conversationId) {
+    conversationId = '69ff4798777455158dc74b38';
+  }
+
+  // Enviar mensaje
+  const res = await fetch(CONFIG.baseUrl + '/conversations/' + conversationId + '/messages', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'ApiKey': CONFIG.apiKey },
-    body: JSON.stringify(body)
+    headers,
+    body: JSON.stringify({ role: 'user', content: message.trim() })
   });
 
   if (!res.ok) {
@@ -776,8 +797,14 @@ async function callAgentAPI(message) {
   }
 
   const data = await res.json();
-  if (data.conversation_id) conversationId = data.conversation_id;
-  return data.response || data.message || data.content || JSON.stringify(data);
+
+  // Extraer respuesta del agente
+  return data?.response ||
+         data?.reply ||
+         data?.assistant_message?.content ||
+         data?.content ||
+         data?.message ||
+         JSON.stringify(data);
 }
 
 // ═══════════════════════════════════════════════
