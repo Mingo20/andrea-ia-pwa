@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#0f0f0f" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Andrea IA" />
+  <meta name="description" content="Andrea IA - Tu asistente inteligente" />
+  <title>Andrea IA</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg: #0f0f0f;
+      --bg2: #1a1a1a;
+      --bg3: #252525;
+      --accent: #39ff14;
+      --accent-glow: rgba(57,255,20,0.35);
+      --text: #ffffff;
+      --text2: #aaaaaa;
+      --user-bubble: #1e3a1e;
+      --agent-bubble: #1e1e1e;
+      --border: #2a2a2a;
+      --input-bg: #1c1c1c;
+      --send-btn: #39ff14;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* HEADER */
+    .header {
+      display: flex;
+      align-items: center;
+      padding: 12px 16px;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      gap: 12px;
+      flex-shrink: 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .header-avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      border: 2px solid var(--accent);
+      object-fit: cover;
+      background: var(--bg3);
+    }
+    .header-info { flex: 1; }
+    .header-name { font-weight: 600; font-size: 15px; }
+    .header-status { font-size: 12px; color: var(--accent); display: flex; align-items: center; gap: 4px; }
+    .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); display: inline-block; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+    .header-actions { display: flex; gap: 8px; }
+    .header-btn {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      background: var(--bg3);
+      border: none;
+      color: var(--text2);
+      font-size: 16px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s;
+    }
+    .header-btn:hover { background: var(--bg2); color: var(--text); }
+
+    /* CHAT AREA */
+    .chat-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0 16px 16px;
+      scroll-behavior: smooth;
+      overscroll-behavior: contain;
+    }
+    .chat-container::-webkit-scrollbar { width: 3px; }
+    .chat-container::-webkit-scrollbar-track { background: transparent; }
+    .chat-container::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    /* WELCOME SCREEN */
+    .welcome {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: calc(100dvh - 140px);
+      padding: 32px 16px;
+      text-align: center;
+      gap: 16px;
+    }
+    .welcome-avatar-wrap {
+      position: relative;
+      width: 110px; height: 110px;
+    }
+    .welcome-avatar-glow {
+      position: absolute;
+      inset: -8px;
+      border-radius: 50%;
+      border: 2.5px solid var(--accent);
+      box-shadow: 0 0 24px var(--accent-glow), 0 0 48px var(--accent-glow);
+      animation: glowPulse 3s ease-in-out infinite;
+    }
+    @keyframes glowPulse {
+      0%,100%{ box-shadow: 0 0 20px var(--accent-glow), 0 0 40px var(--accent-glow); }
+      50%{ box-shadow: 0 0 35px var(--accent-glow), 0 0 70px var(--accent-glow); }
+    }
+    .welcome-avatar {
+      width: 110px; height: 110px;
+      border-radius: 50%;
+      object-fit: cover;
+      position: relative;
+      z-index: 1;
+    }
+    .welcome-title { font-size: 26px; font-weight: 700; margin-top: 8px; }
+    .welcome-title span { color: var(--accent); }
+    .welcome-subtitle { font-size: 14px; color: var(--text2); max-width: 280px; line-height: 1.6; }
+    .suggestions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 8px;
+      max-width: 340px;
+    }
+    .suggestion-btn {
+      padding: 10px 16px;
+      border-radius: 22px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .suggestion-btn:hover { background: var(--bg2); border-color: var(--accent); color: var(--accent); }
+    .suggestion-btn .icon { font-size: 14px; }
+
+    /* MESSAGES */
+    .message-group { margin-top: 16px; display: flex; flex-direction: column; gap: 3px; }
+    .message-row { display: flex; align-items: flex-end; gap: 8px; }
+    .message-row.user { flex-direction: row-reverse; }
+    .bubble {
+      max-width: 78%;
+      padding: 10px 14px;
+      border-radius: 18px;
+      font-size: 14.5px;
+      line-height: 1.55;
+      word-break: break-word;
+    }
+    .bubble.user {
+      background: var(--user-bubble);
+      border-bottom-right-radius: 4px;
+      color: var(--text);
+      border: 1px solid rgba(57,255,20,0.2);
+    }
+    .bubble.agent {
+      background: var(--agent-bubble);
+      border-bottom-left-radius: 4px;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .bubble-avatar {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      object-fit: cover;
+      flex-shrink: 0;
+      border: 1.5px solid var(--accent);
+    }
+    .message-time {
+      font-size: 10px;
+      color: var(--text2);
+      padding: 0 4px;
+      text-align: right;
+    }
+    .message-row.user .message-time { text-align: left; }
+
+    /* TYPING INDICATOR */
+    .typing {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 0 4px;
+    }
+    .typing-dots {
+      background: var(--agent-bubble);
+      border: 1px solid var(--border);
+      padding: 10px 16px;
+      border-radius: 18px;
+      border-bottom-left-radius: 4px;
+      display: flex; gap: 4px; align-items: center;
+    }
+    .typing-dots span {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: bounce 1.4s infinite;
+    }
+    .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-6px)} }
+
+    /* INPUT AREA */
+    .input-area {
+      padding: 10px 12px 16px;
+      background: var(--bg);
+      border-top: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .input-wrap {
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 26px;
+      padding: 8px 8px 8px 16px;
+      transition: border-color 0.2s;
+    }
+    .input-wrap:focus-within { border-color: var(--accent); }
+    #messageInput {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text);
+      font-size: 15px;
+      resize: none;
+      max-height: 120px;
+      overflow-y: auto;
+      line-height: 1.4;
+    }
+    #messageInput::placeholder { color: var(--text2); }
+    .input-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+    .attach-btn, .mic-btn {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      background: transparent;
+      border: none;
+      color: var(--text2);
+      font-size: 18px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s;
+    }
+    .attach-btn:hover, .mic-btn:hover { color: var(--accent); }
+    .mic-btn.recording { color: #ff4444; animation: micPulse 1s infinite; }
+    @keyframes micPulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.15)} }
+    .send-btn {
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      background: var(--send-btn);
+      border: none;
+      color: #000;
+      font-size: 17px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      transition: all 0.2s;
+      box-shadow: 0 0 12px var(--accent-glow);
+    }
+    .send-btn:hover { transform: scale(1.05); box-shadow: 0 0 20px var(--accent-glow); }
+    .send-btn:active { transform: scale(0.96); }
+    .send-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+    /* RECORDING BANNER */
+    .recording-banner {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: rgba(255,68,68,0.1);
+      border: 1px solid rgba(255,68,68,0.3);
+      border-radius: 12px;
+      margin-bottom: 8px;
+      font-size: 13px;
+      color: #ff6666;
+    }
+    .recording-banner.active { display: flex; }
+    .rec-dot { width: 8px; height: 8px; border-radius: 50%; background: #ff4444; animation: micPulse 1s infinite; }
+
+    /* MARKDOWN STYLES */
+    .bubble.agent p { margin-bottom: 6px; }
+    .bubble.agent p:last-child { margin-bottom: 0; }
+    .bubble.agent ul, .bubble.agent ol { padding-left: 18px; margin: 6px 0; }
+    .bubble.agent li { margin-bottom: 3px; }
+    .bubble.agent code {
+      background: rgba(57,255,20,0.1);
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 13px;
+      color: var(--accent);
+    }
+    .bubble.agent pre {
+      background: #111;
+      border-radius: 8px;
+      padding: 10px;
+      overflow-x: auto;
+      margin: 6px 0;
+    }
+    .bubble.agent pre code { background: none; padding: 0; }
+    .bubble.agent strong { color: var(--accent); }
+
+    /* TOAST */
+    .toast {
+      position: fixed;
+      bottom: 90px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 10px 18px;
+      border-radius: 20px;
+      font-size: 13px;
+      opacity: 0;
+      transition: all 0.3s;
+      z-index: 999;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <img src="icon-192.png" alt="Andrea" class="header-avatar" />
+  <div class="header-info">
+    <div class="header-name">Andrea IA</div>
+    <div class="header-status"><span class="status-dot"></span> En línea</div>
+  </div>
+  <div class="header-actions">
+    <button class="header-btn" onclick="newChat()" title="Nueva conversación">✏️</button>
+    <button class="header-btn" onclick="toggleTheme()" title="Tema">☀️</button>
+  </div>
+</div>
+
+<!-- CHAT CONTAINER -->
+<div class="chat-container" id="chatContainer">
+  <!-- WELCOME SCREEN -->
+  <div class="welcome" id="welcomeScreen">
+    <div class="welcome-avatar-wrap">
+      <div class="welcome-avatar-glow"></div>
+      <img src="icon-192.png" alt="Andrea" class="welcome-avatar" />
+    </div>
+    <div class="welcome-title">Hola, soy <span>Andrea</span></div>
+    <div class="welcome-subtitle">Tu asistente inteligente. Puedo ayudarte con planificaciones, documentos, consultas y mucho más.</div>
+    <div class="suggestions">
+      <button class="suggestion-btn" onclick="sendSuggestion('Crear una planificación')"><span class="icon">📅</span> Planificación</button>
+      <button class="suggestion-btn" onclick="sendSuggestion('Crear una rúbrica de evaluación')"><span class="icon">📄</span> Rúbrica</button>
+      <button class="suggestion-btn" onclick="sendSuggestion('¿Qué puedes hacer?')"><span class="icon">❓</span> ¿Qué haces?</button>
+      <button class="suggestion-btn" onclick="sendSuggestion('Redactar un comunicado')"><span class="icon">💬</span> Comunicado</button>
+      <button class="suggestion-btn" onclick="sendSuggestion('Crear un informe')"><span class="icon">📋</span> Informe</button>
+      <button class="suggestion-btn" onclick="sendSuggestion('Consultar lineamientos MINERD')"><span class="icon">📚</span> MINERD</button>
+    </div>
+  </div>
+</div>
+
+<!-- RECORDING BANNER -->
+<div class="recording-banner" id="recordingBanner">
+  <div class="rec-dot"></div>
+  <span>Grabando audio... toca el micrófono para detener</span>
+</div>
+
+<!-- INPUT AREA -->
+<div class="input-area">
+  <div class="input-wrap">
+    <textarea
+      id="messageInput"
+      placeholder="Escríbele a Andrea..."
+      rows="1"
+      autocomplete="off"
+      autocorrect="on"
+    ></textarea>
+    <div class="input-actions">
+      <input type="file" id="fileInput" style="display:none" accept="image/*,application/pdf,.doc,.docx" />
+      <button class="attach-btn" onclick="document.getElementById('fileInput').click()" title="Adjuntar">📎</button>
+      <button class="mic-btn" id="micBtn" onclick="toggleRecording()" title="Voz">🎤</button>
+      <button class="send-btn" id="sendBtn" onclick="sendMessage()" title="Enviar">➤</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════
+// CONFIG — REEMPLAZAR CON TU API KEY Y APP ID
+// ═══════════════════════════════════════════════
+const CONFIG = {
+  apiKey: 'YOUR_API_KEY',          // Reemplazar
+  appId: '69ff4795c5927c8f49974e4b',
+  baseUrl: 'https://api.base44.com/api/apps/69ff4795c5927c8f49974e4b/agent',
+  agentName: 'Andrea IA',
+  agentAvatar: 'icon-192.png'
+};
+
+// ═══════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════
+let conversationId = null;
+let messages = [];
+let isTyping = false;
+let mediaRecorder = null;
+let audioChunks = [];
+let isRecording = false;
+let darkMode = true;
+
+// ═══════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  loadFromStorage();
+  setupTextarea();
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(console.warn);
+  }
+});
+
+function loadFromStorage() {
+  const saved = localStorage.getItem('andrea_conversation');
+  if (saved) {
+    try {
+      const data = JSON.parse(saved);
+      conversationId = data.conversationId;
+      messages = data.messages || [];
+      if (messages.length > 0) {
+        hideWelcome();
+        messages.forEach(m => renderMessage(m.role, m.content, m.time, false));
+        scrollToBottom();
+      }
+    } catch(e) {}
+  }
+}
+
+function saveToStorage() {
+  localStorage.setItem('andrea_conversation', JSON.stringify({
+    conversationId,
+    messages: messages.slice(-50)
+  }));
+}
+
+// ═══════════════════════════════════════════════
+// UI HELPERS
+// ═══════════════════════════════════════════════
+function hideWelcome() {
+  const w = document.getElementById('welcomeScreen');
+  if (w) w.style.display = 'none';
+}
+
+function showToast(msg, duration = 2500) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), duration);
+}
+
+function getTime() {
+  return new Date().toLocaleTimeString('es-DO', { hour: '2-digit', minute: '2-digit' });
+}
+
+function scrollToBottom() {
+  const c = document.getElementById('chatContainer');
+  setTimeout(() => c.scrollTo({ top: c.scrollHeight, behavior: 'smooth' }), 50);
+}
+
+function setupTextarea() {
+  const input = document.getElementById('messageInput');
+  input.addEventListener('input', () => {
+    input.style.height = 'auto';
+    input.style.height = Math.min(input.scrollHeight, 120) + 'px';
+  });
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+  });
+}
+
+function newChat() {
+  if (messages.length === 0) return;
+  if (!confirm('¿Iniciar una nueva conversación? El historial actual se borrará.')) return;
+  conversationId = null;
+  messages = [];
+  localStorage.removeItem('andrea_conversation');
+  document.getElementById('chatContainer').innerHTML = `
+    <div class="welcome" id="welcomeScreen">
+      <div class="welcome-avatar-wrap">
+        <div class="welcome-avatar-glow"></div>
+        <img src="icon-192.png" alt="Andrea" class="welcome-avatar" />
+      </div>
+      <div class="welcome-title">Hola, soy <span>Andrea</span></div>
+      <div class="welcome-subtitle">Tu asistente inteligente. Puedo ayudarte con planificaciones, documentos, consultas y mucho más.</div>
+      <div class="suggestions">
+        <button class="suggestion-btn" onclick="sendSuggestion('Crear una planificación')"><span class="icon">📅</span> Planificación</button>
+        <button class="suggestion-btn" onclick="sendSuggestion('Crear una rúbrica de evaluación')"><span class="icon">📄</span> Rúbrica</button>
+        <button class="suggestion-btn" onclick="sendSuggestion('¿Qué puedes hacer?')"><span class="icon">❓</span> ¿Qué haces?</button>
+        <button class="suggestion-btn" onclick="sendSuggestion('Redactar un comunicado')"><span class="icon">💬</span> Comunicado</button>
+        <button class="suggestion-btn" onclick="sendSuggestion('Crear un informe')"><span class="icon">📋</span> Informe</button>
+        <button class="suggestion-btn" onclick="sendSuggestion('Consultar lineamientos MINERD')"><span class="icon">📚</span> MINERD</button>
+      </div>
+    </div>`;
+}
+
+function toggleTheme() {
+  // Dark mode only for now — can expand
+  showToast('Tema oscuro activo ✓');
+}
+
+// ═══════════════════════════════════════════════
+// RENDER MESSAGES
+// ═══════════════════════════════════════════════
+function renderMessage(role, content, time, save = true) {
+  const container = document.getElementById('chatContainer');
+  const isUser = role === 'user';
+  const group = document.createElement('div');
+  group.className = 'message-group';
+
+  const row = document.createElement('div');
+  row.className = `message-row ${isUser ? 'user' : 'agent'}`;
+
+  if (!isUser) {
+    const av = document.createElement('img');
+    av.src = CONFIG.agentAvatar;
+    av.className = 'bubble-avatar';
+    row.appendChild(av);
+  }
+
+  const bubble = document.createElement('div');
+  bubble.className = `bubble ${isUser ? 'user' : 'agent'}`;
+  bubble.innerHTML = isUser ? escapeHtml(content) : renderMarkdown(content);
+  row.appendChild(bubble);
+  group.appendChild(row);
+
+  const timeEl = document.createElement('div');
+  timeEl.className = 'message-time';
+  timeEl.textContent = time || getTime();
+  group.appendChild(timeEl);
+
+  container.appendChild(group);
+
+  if (save) {
+    messages.push({ role, content, time: time || getTime() });
+    saveToStorage();
+  }
+
+  scrollToBottom();
+}
+
+function escapeHtml(text) {
+  return text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function renderMarkdown(text) {
+  return text
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>')
+    .replace(/^### (.*)/gm, '<strong>$1</strong>')
+    .replace(/^## (.*)/gm, '<strong>$1</strong>')
+    .replace(/^# (.*)/gm, '<strong>$1</strong>')
+    .replace(/^- (.*)/gm, '<li>$1</li>')
+    .replace(/(<li>.*<\/li>)/gs, '<ul>$1</ul>')
+    .replace(/\n\n/g, '</p><p>')
+    .replace(/\n/g, '<br>')
+    .replace(/^(.+)$/, '<p>$1</p>');
+}
+
+// ═══════════════════════════════════════════════
+// TYPING INDICATOR
+// ═══════════════════════════════════════════════
+function showTyping() {
+  const container = document.getElementById('chatContainer');
+  const div = document.createElement('div');
+  div.className = 'typing';
+  div.id = 'typingIndicator';
+  div.innerHTML = `
+    <img src="${CONFIG.agentAvatar}" class="bubble-avatar" alt="Andrea" />
+    <div class="typing-dots"><span></span><span></span><span></span></div>`;
+  container.appendChild(div);
+  scrollToBottom();
+}
+
+function hideTyping() {
+  const el = document.getElementById('typingIndicator');
+  if (el) el.remove();
+}
+
+// ═══════════════════════════════════════════════
+// SEND MESSAGE
+// ═══════════════════════════════════════════════
+async function sendSuggestion(text) {
+  document.getElementById('messageInput').value = text;
+  await sendMessage();
+}
+
+async function sendMessage() {
+  const input = document.getElementById('messageInput');
+  const text = input.value.trim();
+  if (!text || isTyping) return;
+
+  hideWelcome();
+  input.value = '';
+  input.style.height = 'auto';
+  document.getElementById('sendBtn').disabled = true;
+  isTyping = true;
+
+  renderMessage('user', text);
+  showTyping();
+
+  try {
+    const response = await callAgentAPI(text);
+    hideTyping();
+    renderMessage('agent', response);
+  } catch (err) {
+    hideTyping();
+    renderMessage('agent', '⚠️ No pude conectarme. Verifica tu API key o intenta de nuevo.');
+    console.error(err);
+  } finally {
+    document.getElementById('sendBtn').disabled = false;
+    isTyping = false;
+  }
+}
+
+// ═══════════════════════════════════════════════
+// BASE44 AGENT API
+// ═══════════════════════════════════════════════
+async function callAgentAPI(message) {
+  const body = { message };
+  if (conversationId) body.conversation_id = conversationId;
+
+  const res = await fetch(CONFIG.baseUrl + '/chat', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'ApiKey': CONFIG.apiKey
+    },
+    body: JSON.stringify(body)
+  });
+
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`API Error ${res.status}: ${err}`);
+  }
+
+  const data = await res.json();
+  if (data.conversation_id) conversationId = data.conversation_id;
+  return data.response || data.message || data.content || JSON.stringify(data);
+}
+
+// ═══════════════════════════════════════════════
+// AUDIO RECORDING + TRANSCRIPTION
+// ═══════════════════════════════════════════════
+async function toggleRecording() {
+  if (!isRecording) {
+    await startRecording();
+  } else {
+    stopRecording();
+  }
+}
+
+async function startRecording() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    mediaRecorder = new MediaRecorder(stream, { mimeType: getSupportedMimeType() });
+    audioChunks = [];
+
+    mediaRecorder.ondataavailable = (e) => {
+      if (e.data.size > 0) audioChunks.push(e.data);
+    };
+
+    mediaRecorder.onstop = async () => {
+      stream.getTracks().forEach(t => t.stop());
+      const audioBlob = new Blob(audioChunks, { type: mediaRecorder.mimeType });
+      await transcribeAudio(audioBlob);
+    };
+
+    mediaRecorder.start(250);
+    isRecording = true;
+    document.getElementById('micBtn').classList.add('recording');
+    document.getElementById('micBtn').textContent = '⏹️';
+    document.getElementById('recordingBanner').classList.add('active');
+  } catch (err) {
+    showToast('No se pudo acceder al micrófono');
+    console.error(err);
+  }
+}
+
+function stopRecording() {
+  if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+    mediaRecorder.stop();
+  }
+  isRecording = false;
+  document.getElementById('micBtn').classList.remove('recording');
+  document.getElementById('micBtn').textContent = '🎤';
+  document.getElementById('recordingBanner').classList.remove('active');
+  showToast('Procesando audio...');
+}
+
+function getSupportedMimeType() {
+  const types = ['audio/webm;codecs=opus', 'audio/webm', 'audio/ogg;codecs=opus', 'audio/mp4'];
+  for (const type of types) {
+    if (MediaRecorder.isTypeSupported(type)) return type;
+  }
+  return '';
+}
+
+async function transcribeAudio(audioBlob) {
+  // Usar Web Speech API si está disponible (sin costo)
+  if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+    showToast('Usando reconocimiento de voz del navegador');
+    return;
+  }
+
+  // Fallback: Enviar audio a Base44 para transcripción
+  try {
+    const formData = new FormData();
+    formData.append('file', audioBlob, 'recording.webm');
+
+    const res = await fetch(CONFIG.baseUrl + '/transcribe', {
+      method: 'POST',
+      headers: { 'ApiKey': CONFIG.apiKey },
+      body: formData
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      const transcript = data.text || data.transcript || '';
+      if (transcript) {
+        document.getElementById('messageInput').value = transcript;
+        showToast('✓ Audio transcrito');
+      }
+    }
+  } catch (err) {
+    showToast('Error al transcribir audio');
+  }
+}
+
+// ═══════════════════════════════════════════════
+// SPEECH RECOGNITION (Web Speech API)
+// ═══════════════════════════════════════════════
+function startSpeechRecognition() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) return false;
+
+  const recognition = new SpeechRecognition();
+  recognition.lang = 'es-DO';
+  recognition.continuous = false;
+  recognition.interimResults = true;
+
+  recognition.onstart = () => {
+    isRecording = true;
+    document.getElementById('micBtn').classList.add('recording');
+    document.getElementById('micBtn').textContent = '⏹️';
+    document.getElementById('recordingBanner').classList.add('active');
+  };
+
+  recognition.onresult = (event) => {
+    const transcript = Array.from(event.results)
+      .map(r => r[0].transcript).join('');
+    document.getElementById('messageInput').value = transcript;
+  };
+
+  recognition.onend = () => {
+    isRecording = false;
+    document.getElementById('micBtn').classList.remove('recording');
+    document.getElementById('micBtn').textContent = '🎤';
+    document.getElementById('recordingBanner').classList.remove('active');
+    const text = document.getElementById('messageInput').value.trim();
+    if (text) sendMessage();
+  };
+
+  recognition.onerror = () => {
+    isRecording = false;
+    document.getElementById('micBtn').classList.remove('recording');
+    document.getElementById('micBtn').textContent = '🎤';
+    document.getElementById('recordingBanner').classList.remove('active');
+  };
+
+  recognition.start();
+  return true;
+}
+
+// Override toggleRecording para usar Web Speech API cuando esté disponible
+const originalToggle = toggleRecording;
+window.toggleRecording = async function() {
+  if (!isRecording) {
+    const usedSpeech = startSpeechRecognition();
+    if (!usedSpeech) await startRecording();
+  } else {
+    if (window.SpeechRecognition || window.webkitSpeechRecognition) {
+      // handled by onend
+    } else {
+      stopRecording();
+    }
+  }
+};
+
+// FILE ATTACH
+document.getElementById('fileInput').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  showToast(`Adjunto: ${file.name}`);
+  const input = document.getElementById('messageInput');
+  input.value = input.value ? input.value + ` [Archivo: ${file.name}]` : `[Archivo: ${file.name}]`;
+});
+</script>
+</body>
+</html>
