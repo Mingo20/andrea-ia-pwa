@@ -761,57 +761,61 @@ async function sendMessage() {
 // API
 // ═══════════════════════════════════════════════
 async function callAgentAPI(message) {
+  const FIXED_CONV = '69ff4798777455158dc74b38';
   const headers = {
     'Content-Type': 'application/json',
     'api_key': CONFIG.apiKey
   };
 
-  // Siempre usar conversación fija del owner
-  if (!conversationId) {
-    conversationId = '69ff4798777455158dc74b38';
-  }
+  // Usar conversación fija del owner
+  if (!conversationId) conversationId = FIXED_CONV;
 
-  // Contar mensajes actuales antes de enviar (para detectar respuesta nueva)
-  let prevCount = 0;
+  // Guardar cuántos mensajes hay antes de enviar
+  let msgCountBefore = 0;
   try {
-    const prevRes = await fetch(CONFIG.baseUrl + '/conversations/' + conversationId, { headers });
-    if (prevRes.ok) {
-      const prevData = await prevRes.json();
-      prevCount = (prevData?.messages || []).filter(m => m.role === 'assistant' || m.role === 'agent').length;
+    const preRes = await fetch(CONFIG.baseUrl + '/conversations/' + conversationId, { headers });
+    if (preRes.ok) {
+      const preData = await preRes.json();
+      msgCountBefore = (preData?.messages || []).length;
     }
   } catch(e) {}
 
   // Enviar mensaje del usuario
-  const res = await fetch(CONFIG.baseUrl + '/conversations/' + conversationId + '/messages', {
+  const sendRes = await fetch(CONFIG.baseUrl + '/conversations/' + conversationId + '/messages', {
     method: 'POST',
     headers,
     body: JSON.stringify({ role: 'user', content: message.trim() })
   });
 
-  if (!res.ok) {
-    const err = await res.text();
-    throw new Error('API Error ' + res.status + ': ' + err);
+  if (!sendRes.ok) {
+    const err = await sendRes.text();
+    throw new Error('Error ' + sendRes.status + ': ' + err.slice(0, 200));
   }
 
-  // Polling: esperar que aparezca un nuevo mensaje del assistant
+  // Polling — esperar nuevo mensaje del assistant
   for (let i = 0; i < 20; i++) {
     await new Promise(r => setTimeout(r, 2500));
     try {
       const convRes = await fetch(CONFIG.baseUrl + '/conversations/' + conversationId, { headers });
       if (!convRes.ok) continue;
       const convData = await convRes.json();
-      const assistants = (convData?.messages || []).filter(m => m.role === 'assistant' || m.role === 'agent');
-      if (assistants.length > prevCount) {
-        const last = assistants[assistants.length - 1];
-        const content = last?.content;
-        if (content && typeof content === 'string' && content.trim()) {
-          return content;
+      const msgs = convData?.messages || [];
+
+      if (msgs.length > msgCountBefore) {
+        const newMsgs = msgs.slice(msgCountBefore);
+        const agentMsg = [...newMsgs].reverse().find(m =>
+          m.role === 'assistant' || m.role === 'agent'
+        );
+        if (agentMsg?.content) {
+          return typeof agentMsg.content === 'string'
+            ? agentMsg.content
+            : JSON.stringify(agentMsg.content);
         }
       }
-    } catch(e) { /* continuar */ }
+    } catch(e) { continue; }
   }
 
-  return 'Espera un momento, sigo procesando tu mensaje...';
+  return '⏳ El agente tardó demasiado. Por favor intenta de nuevo.';
 }
 
 // ═══════════════════════════════════════════════
