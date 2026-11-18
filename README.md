@@ -1,38 +1,69 @@
-# Andrea IA — PWA Chat
+<div align="center">
 
-Interfaz de chat agentica para el Superagent **Andrea** en Base44.
+<img src="https://raw.githubusercontent.com/Mingo20/dtech/main/assets/brand/dg-logo-512.png" width="84" alt="DGTech" />
 
-## Características
-- 🌙 Dark mode con tema verde neón
-- 📱 PWA instalable (Android/iOS/Desktop)
-- 🎤 Transcripción de voz a texto (Web Speech API)
-- 💬 Conexión en tiempo real con Base44 Superagent API
-- 💾 Historial de conversación persistente (localStorage)
-- ⚡ Service Worker para uso offline parcial
+# Andrea IA
 
-## Setup
+**Andrea IA, asistente inteligente de DGTech instalable en el celular.**
 
-1. Clona este repo
-2. Abre `index.html`
-3. Configura tu API Key en la sección `CONFIG`:
-   ```js
-   const CONFIG = {
-     apiKey: 'TU_API_KEY_AQUI',
-     ...
-   }
-   ```
-4. Deploy en GitHub Pages (automático vía Actions)
+![Versión](https://img.shields.io/badge/versión-1.2.0-FF6A13?style=flat-square) ![Estado](https://img.shields.io/badge/estado-Producción-2EA44F?style=flat-square) ![Tipo](https://img.shields.io/badge/tipo-PWA_%2B_proxy_Base44-0B2545?style=flat-square) ![DGTech](https://img.shields.io/badge/by-DGTech-FF6A13?style=flat-square)
 
-## API Key
+[**Abrir la aplicación**](https://mingo20.github.io/andrea-ia-pwa/) · [Hub DGTech](https://mingo20.github.io/dtech/) · [Guía para agentes](AGENTS.md) · [Cambios](CHANGELOG.md)
 
-Ve a tu Superagent → Customize → Developer → API Reference → copia tu API Key.
+<img src="https://raw.githubusercontent.com/Mingo20/dtech/main/assets/shots/andrea.jpg" alt="Andrea IA" width="720" />
 
-## Estructura
-```
-/
-├── index.html      # App principal + lógica
-├── manifest.json   # PWA manifest
-├── sw.js           # Service Worker
-├── icon-192.png    # Ícono PWA (192px)
-└── icon-512.png    # Ícono PWA (512px)
-```
+</div>
+
+## El problema
+
+Un asistente conversacional propio, siempre disponible.
+
+## Qué hace
+
+- Chat con memoria de conversación
+- Instalable como PWA
+- Proxy seguro hacia el agente
+
+## Cómo está construido
+
+**Tipo:** PWA + proxy Base44
+
+La PWA habla con andreaChatProxy, que reenvía al agente.
+
+**Tecnologías**
+
+- HTML, CSS y JavaScript
+- Service Worker (andrea-v1.2)
+- Proxy andreaChatProxy en Base44
+
+**Backend**
+
+- andreaChatProxy
+
+**Datos**
+
+- Conversación local (andrea_conversation)
+
+## Datos sensibles
+
+Conversaciones del usuario.
+
+## Reglas del proyecto
+
+- Esta es la versión vigente: andrea-ia y andrea-chat son anteriores
+
+## Pendientes conocidos
+
+- Archivar andrea-ia y andrea-chat
+
+## Estructura del repositorio
+
+Consulta [AGENTS.md](AGENTS.md) para el mapa de archivos y las instrucciones de trabajo.
+
+## Parte de DGTech
+
+Este proyecto forma parte del ecosistema **DGTech**, un estudio de software dominicano que construye aplicaciones instalables para resolver problemas reales. Todas las aplicaciones están en [https://mingo20.github.io/dtech/](https://mingo20.github.io/dtech/).
+
+---
+
+<sub>© 2026 DGTech · Domingo Guerra · Todos los derechos reservados. Consulta el archivo NOTICE.</sub>
